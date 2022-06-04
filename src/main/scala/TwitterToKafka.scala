@@ -57,7 +57,11 @@ object TwitterToKafka{
         ex.printStackTrace
       }
     }
+
+    // Adding listener to the twitter stream
     twitterStream.addListener(listener)
+
+    // Adding filter to track the keywords
     val query = new FilterQuery().track(keywords)
     twitterStream.filter(query)
 
@@ -66,7 +70,6 @@ object TwitterToKafka{
       val props = new Properties()
       props.put("bootstrap.servers", "localhost:9092")
       props.put("acks", "all")
-      props.put("retries", 0)
       props.put("key.serializer", classOf[StringSerializer].getName)
       props.put("value.serializer", classOf[StringSerializer].getName)
       props
@@ -77,10 +80,10 @@ object TwitterToKafka{
 
     // Take x messages from stream and push it to kafka topic named covid-tweet
     var r = 0
-    for (_ <- 0 until 1000) {
+    for (_ <- 0 until 100) {
       val msg =  queue.poll(5, TimeUnit.SECONDS)
       if (msg != null) {
-        // println(msg)
+        println(msg)
         r += 1
         producer.send(new ProducerRecord[String, String]("covid-tweet", null, msg))
       }
