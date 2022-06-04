@@ -29,7 +29,6 @@ object Query5_TwitterToKafka {
       val props = new Properties()
       props.put("bootstrap.servers", "localhost:9092")
       props.put("acks", "all")
-      props.put("retries", 0)
       props.put("key.serializer", classOf[StringSerializer].getName)
       props.put("value.serializer", classOf[StringSerializer].getName)
       props
@@ -39,7 +38,6 @@ object Query5_TwitterToKafka {
     val producer = new KafkaProducer[String, String](kafkaProducerProps)
     val twitter = new TwitterFactory(cb.build()).getInstance()
     try {
-
       var page = 250
       for (_ <- page until 500) {
 
@@ -90,7 +88,7 @@ object Query5_TwitterToKafka {
     try Query5_TwitterToKafka.run(consumerKey, consumerSecret, accessToken, accessTokenSecret)
     catch {
       case e: InterruptedException =>
-        println(e)
+        println(e.printStackTrace())
     }
   }
 }
