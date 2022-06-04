@@ -1,4 +1,4 @@
-Top 100 words occurring on tweets involving corona virus
+// Top 100 words occurring on tweets involving corona virus
 
 db.covid_tweets.aggregate([
   { $project: { words: { $split: ["$text", " "] } } },

@@ -1,4 +1,4 @@
-Overall number of tweets per country on a daily basis
+// Overall number of tweets per country on a daily basis
 
 db.covid_tweets.aggregate([
 { $match: { "created_at": { $gte: "$now" } } },

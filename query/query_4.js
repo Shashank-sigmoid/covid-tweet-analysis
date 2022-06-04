@@ -1,4 +1,4 @@
-Top 100 words occurring on tweets involving corona virus on a country basis
+// Top 100 words occurring on tweets involving corona virus on a country basis
 
 db.covid_tweets.aggregate([
 { $project: { user_location: "$user_location", words: { $split: ["$text", " "] } } },
