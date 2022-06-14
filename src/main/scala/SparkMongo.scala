@@ -173,6 +173,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.table2").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(startdate != "") {
       val df = spark.sqlContext.read.option("pipeline",
         s"""[{ $$match: {"date": { $$gte: ISODate("$startdate")}}},
@@ -182,6 +183,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.table2").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(enddate != "") {
       val df = spark.sqlContext.read.option("pipeline",
         s"""[{ $$match: { "date": { $$lt: ISODate("$enddate")}}},
@@ -191,6 +193,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.table2").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else {
       val df = spark.sqlContext.read.option("pipeline",
         s"""[{ $$group: { "_id": "$$word", "frequency": { $$sum: "$$count"}}},
@@ -217,16 +220,19 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.covid_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
       else if(startdate!=""){
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"created_at": { $$gte: ISODate("$startdate") } } },{ $$project: { user_location: "$$user_location", words: { $$split: ["$$text", " "] } } },{ $$unwind: "$$words" },{ $$match : { words: { $$nin: ["a", "I", "are", "is", "to", "the", "of", "and", "in", "RT", "was", "on" , "for"]} } },{ $$group: { _id: { location: "$$user_location", word: "$$words"}, total: { "$$sum": 1 } } },{ $$sort: { total : -1 } },{ $$limit: 100 }]""")
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.covid_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
       else if(enddate !=""){
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"created_at": { $$lt: ISODate("$enddate") } } },{ $$project: { user_location: "$$user_location", words: { $$split: ["$$text", " "] } } },{ $$unwind: "$$words" },{ $$match : { words: { $$nin: ["a", "I", "are", "is", "to", "the", "of", "and", "in", "RT", "was", "on" , "for"]} } },{ $$group: { _id: { location: "$$user_location", word: "$$words"}, total: { "$$sum": 1 } } },{ $$sort: { total : -1 } },{ $$limit: 100 }]""")
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.covid_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
       else {
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$project: { user_location: "$$user_location", words: { $$split: ["$$text", " "] } } },{ $$unwind: "$$words" },{ $$match : { words: { $$nin: ["a", "I", "are", "is", "to", "the", "of", "and", "in", "RT", "was", "on" , "for"]} } },{ $$group: { _id: { location: "$$user_location", word: "$$words"}, total: { "$$sum": 1 } } },{ $$sort: { total : -1 } },{ $$limit: 100 }]""")
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.covid_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
@@ -250,16 +256,19 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.who_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(startdate != "") {
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match: {$$and: [{ "full_text": { $$regex: "prevent.*|precaut.*", $$options: "i" } }, {"created_at": { $$gte: ISODate("$startdate") }}]}},{ $$limit: 10 }]""")
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.who_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(enddate != "") {
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match: {$$and: [{ "full_text": { $$regex: "prevent.*|precaut.*", $$options: "i" } }, {"created_at": { $$lt: ISODate("$enddate") } }]}},{ $$limit: 10 }]""")
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.who_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else {
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match: {$$and: [{ "full_text": { $$regex: "prevent.*|precaut.*", $$options: "i" } }]}},{ $$limit: 10 }]""")
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.who_tweets").format("com.mongodb.spark.sql.DefaultSource").load()
@@ -298,18 +307,21 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(startdate != "") {
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": { $$gte: ISODate("$startdate") } } },
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: 10 }]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(enddate != "") {
       val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": {$$lt: ISODate("$enddate") } } },
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: 10 }]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else {
       val df = spark.sqlContext.read.option("pipeline", s"""[
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: 10 }]""".stripMargin)
@@ -335,6 +347,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else {
       val df = spark.sqlContext.read.option("pipeline", s"""[
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: $Limit }]""".stripMargin)
@@ -361,6 +374,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(startdate != "") {
       val df = spark.sqlContext.read.option("pipeline",
         s"""[{ $$match : {"Last Updated": { $$gte: ISODate("$startdate") } } },{ $$project:{"location": "$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
@@ -368,6 +382,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else if(enddate != "") {
       val df = spark.sqlContext.read.option("pipeline",
         s"""[{ $$match : {"Last Updated": {  $$lt: ISODate("$enddate") } } },{ $$project:{"location": "$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
@@ -375,6 +390,7 @@ object SparkMongo {
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
+
     else {
       val df = spark.sqlContext.read.option("pipeline",
         s"""[{ $$project:{"location":"$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
@@ -484,7 +500,6 @@ object SparkMongo {
     // { "_id": { "oid": "624dd4a49898fd74d9963672"}, "created_at": "Wed Apr 06 15:30:55 +0000 2022", "entities_hashtags": "[]", "id": "151172816...
 
     json_string.mkString("[", ",", "]")  // [  {}, {}, {} ]
-
   }
 
   def main(args: Array[String]): Unit = {
