@@ -293,19 +293,19 @@ object SparkMongo {
       .getOrCreate()
 
     if(startdate != "" && enddate != "") {
-      val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": {$$and:{ $$gte: "$startdate", $$lte: "$enddate" } } } },
+      val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": { $$gte: ISODate("$startdate"), $$lt: ISODate("$enddate") } } },
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: 10 }]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
     else if(startdate != "") {
-      val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": { $$gte: "$startdate"} } },
+      val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": { $$gte: ISODate("$startdate") } } },
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: 10 }]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
     else if(enddate != "") {
-      val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": {$$lte: "$enddate" } } },
+      val df = spark.sqlContext.read.option("pipeline", s"""[{ $$match : {"dateConfirmed": {$$lt: ISODate("$enddate") } } },
                                                             |{ $$group: { _id: "$$source", Count: { $$sum: 1 }, Total: { $$sum: "$$amount" } } },{ $$sort: { Total: -1 } },{ $$limit: 10 }]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.donations").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
@@ -356,29 +356,29 @@ object SparkMongo {
 
     if(startdate != "" && enddate != "") {
       val df = spark.sqlContext.read.option("pipeline",
-        s"""[{ $$match : {"last_Updated": { $$gte:"$startdate", $$lte: "$enddate" } } },{$$project:{"location":"$$location", "RankOfImpactedCountry":1,"confirmedCases":"$$confirmed", _id:0}},
-            |{$$setWindowFields: {sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
+        s"""[{ $$match : {"Last Updated": { $$gte: ISODate("$startdate"), $$lt: ISODate("$enddate") } } },{ $$project:{"location": "$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
+            |{ $$setWindowFields: {sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
     else if(startdate != "") {
       val df = spark.sqlContext.read.option("pipeline",
-        s"""[{ $$match : {"last_Updated": { $$gte:"$startdate" } } },{$$project:{"location":"$$location", "RankOfImpactedCountry":1,"confirmedCases":"$$confirmed", _id:0}},
-            |{$$setWindowFields: {sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
+        s"""[{ $$match : {"Last Updated": { $$gte: ISODate("$startdate") } } },{ $$project:{"location": "$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
+            |{ $$setWindowFields: {sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
     else if(enddate != "") {
       val df = spark.sqlContext.read.option("pipeline",
-        s"""[{ $$match : {"last_Updated": {  $$lte: "$enddate" } } },{$$project:{"location":"$$location", "RankOfImpactedCountry":1,"confirmedCases":"$$confirmed", _id:0}},
-            |{$$setWindowFields: {sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
+        s"""[{ $$match : {"Last Updated": {  $$lt: ISODate("$enddate") } } },{ $$project:{"location": "$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
+            |{ $$setWindowFields: {sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
     else {
       val df = spark.sqlContext.read.option("pipeline",
-        s"""[{$$project:{"location":"$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
-            |{$$setWindowFields: { sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
+        s"""[{ $$project:{"location":"$$Country", "RankOfImpactedCountry":1,"confirmedCases":"$$Confirmed cases", _id:0}},
+            |{ $$setWindowFields: { sortBy: { confirmed: -1 },output: {RankOfImpactedCountry: {$$rank: {}}}}}]""".stripMargin)
       val newdf = df.option("uri", "mongodb://localhost:27017/twitter_db.cases_data").format("com.mongodb.spark.sql.DefaultSource").load()
       dataframeToJsonString(newdf)
     }
