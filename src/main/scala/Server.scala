@@ -2,18 +2,26 @@
 import SparkMongo.{fetchAllJsonString, query1_date, query2_date, query3_date, query4_date, query5_date, query5_limit, query6_date, query6_sort, query7_country, query7_date, query8_country, query8_date}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.StatusCodes.NotFound
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.RejectionHandler
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+
 object Server extends App {
 
   implicit val system: ActorSystem = ActorSystem("ProxySystem")
 
+  // Exception handling by printing the entity on getting incorrect URL
+  implicit def rejectionHandler = RejectionHandler.newBuilder().handleNotFound {
+    complete(HttpResponse(NotFound, entity = "The requested resource could not be found."))
+  }.result()
+
   val route = pathPrefix("api") {
     concat(
-
       get {
         path("hello") {
           complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Welcome to the webpage of our server...</h1>"))
@@ -160,7 +168,7 @@ object Server extends App {
 
     )
   }
+
   val bindingFuture = Http().newServerAt("127.0.0.1", port = 8086).bindFlow(route)
   Await.result(system.whenTerminated, Duration.Inf)
-
 }
