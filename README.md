@@ -67,7 +67,6 @@ lazy val root = (project in file("."))
   .settings(
     name := "covid-tweet-analysis"
   )
-
 ```
 
 3. Start kafka and zookeeper with the following command:
@@ -108,7 +107,7 @@ Now go to localhost:9021 and create a topic `test-topic` with default settings
 ```bash
 ~ kafka-console-producer --broker-list localhost:9092 --topic covid-tweet
 >{"name": "Shantanu", "age": 22, "gender": "Male"}
->{"name": "Bhavesh", "age":21, "gender": "Male"}
+>{"name": "Bhavesh", "age": 21, "gender": "Male"}
 ```
 Open another terminal for consumer
 ```bash
@@ -198,7 +197,7 @@ send third message
 
 `Server.scala`
 
-Go to `localhost:8080/api/all`
+Go to `localhost:8086/api/all`
 
 **Result**
 ```json
